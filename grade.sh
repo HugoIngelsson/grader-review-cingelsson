@@ -6,11 +6,48 @@ rm -rf grading-area
 mkdir grading-area
 
 git clone $1 student-submission
-echo 'Finished cloning'
 
+if [[ $? -ne 0 ]]
+then
+    echo 'Issue with github link!'
+    exit
+else
+    echo 'Finished cloning'
+fi
 
-# Draw a picture/take notes on the directory structure that's set up after
-# getting to this point
+if [[ -f student-submission/ListExamples.java ]]
+then
+    echo 'File found'
+else
+    echo 'Missing ListExamples.java'
+    exit
+fi
 
-# Then, add here code to compile and run, and do any post-processing of the
-# tests
+cp student-submission/ListExamples.java grading-area
+cp TestListExamples.java grading-area
+cp -r lib grading-area
+
+cd grading-area
+javac -cp $CPATH *.java
+
+if [[ $? -ne 0 ]]
+then
+    echo 'Compilation error. See message above!'
+    exit
+else
+    echo 'Compilation successful'
+fi
+
+java -cp $CPATH org.junit.runner.JUnitCore TestListExamples > junit-output.txt
+
+if [[ $? -eq 0 ]]
+then
+    echo 'All tests passed'
+    exit
+fi
+
+ERRORS=$(tail -n 2 junit-output.txt)
+TOTAL=$(echo "$ERRORS" | cut -d " " -f 3 | rev | cut -c 2- | rev)
+FAILURES=$(echo "$ERRORS" | cut -d " " -f 6)
+SUCCESSES=$(( $TOTAL - $FAILURES ))
+echo "Succeeded:" $SUCCESSES "/" $TOTAL
