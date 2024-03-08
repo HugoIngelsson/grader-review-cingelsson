@@ -10,6 +10,7 @@ git clone $1 student-submission
 if [[ $? -ne 0 ]]
 then
     echo 'Issue with github link!'
+    echo 'Grade: 0 / 1'
     exit
 else
     echo 'Finished cloning'
@@ -20,6 +21,7 @@ then
     echo 'File found'
 else
     echo 'Missing ListExamples.java'
+    echo 'Grade: 0 / 1'
     exit
 fi
 
@@ -33,6 +35,7 @@ javac -cp $CPATH *.java
 if [[ $? -ne 0 ]]
 then
     echo 'Compilation error. See message above!'
+    echo 'Grade: 0 / 1'
     exit
 else
     echo 'Compilation successful'
